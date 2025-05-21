@@ -6,6 +6,13 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.GOOGLE_API_KEY) {
+      return NextResponse.json(
+        { error: "API key is not configured. Please set GOOGLE_API_KEY in your environment variables." },
+        { status: 500 }
+      );
+    }
+
     const { text } = await request.json();
     
     if (!text) {
@@ -17,7 +24,10 @@ export async function POST(request: Request) {
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const prompt = `Summarize the following text into 1-4 short sentences. The summary should start with the most relevant information, as the first 5-6 words will be used as a text thumbnail. Include any reference numbers or key identifiers.
+    const prompt = `Summarize the following text into 1-4 short sentences. The first 5-6 words are crucial and should be direct and action-oriented, avoiding words like 'regarding', 'concerning', or 'about'. Start with the most important action or subject. Include any reference numbers or key identifiers.
+
+Example format:
+"Engineer visit scheduling: FSI0252801" followed by the rest of the summary.
 
 Text to summarize:
 ${text}`;
@@ -38,8 +48,25 @@ ${text}`;
     return NextResponse.json({ summary });
   } catch (error) {
     console.error('Gemini API Error:', error);
+    
+    // Check for specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return NextResponse.json(
+          { error: "Invalid API key. Please check your GOOGLE_API_KEY configuration." },
+          { status: 401 }
+        );
+      }
+      if (error.message.includes('model')) {
+        return NextResponse.json(
+          { error: "Model configuration error. Please check the model name and availability." },
+          { status: 500 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: "Failed to summarise. Please check your API key and try again." },
+      { error: "Failed to summarize. Please try again later." },
       { status: 500 }
     );
   }
