@@ -24,10 +24,17 @@ export async function POST(request: Request) {
 
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const prompt = `Summarize the following text into 1-4 short sentences. The first 5-6 words are crucial and should be direct and action-oriented, avoiding words like 'regarding', 'concerning', or 'about'. Start with the most important action or subject. Include any reference numbers or key identifiers.
+    const prompt = `Summarize the following text into 1-4 short sentences. Follow these specific rules:
 
-Example format:
-"Engineer visit scheduling: FSI0252801" followed by the rest of the summary.
+1. The first 5-6 words are crucial and should be direct and action-oriented, avoiding words like 'regarding', 'concerning', or 'about'.
+2. If the text contains a delivery or tracking number, ALWAYS start with that number (e.g., "02167500003781 - part shipped to locker").
+3. If the text contains an FSI number (FSIxxxxxxx), do NOT include it in the first 6 words. It can be mentioned later in the summary if relevant.
+4. Start with the most important action or subject.
+5. Include any other reference numbers or key identifiers.
+
+Example formats:
+- For tracking numbers: "02167500003781 - part shipped to locker" followed by the rest of the summary.
+- For other cases: "Engineer visit scheduling: FSI0252801" followed by the rest of the summary.
 
 Text to summarize:
 ${text}`;
