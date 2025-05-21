@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type SummaryResponse = {
   summary: string;
@@ -12,6 +12,18 @@ export default function Home() {
   const [summary, setSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const summaryTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTextareaHeight = (element: HTMLTextAreaElement) => {
+    element.style.height = 'auto';
+    element.style.height = `${element.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    if (summaryTextareaRef.current) {
+      adjustTextareaHeight(summaryTextareaRef.current);
+    }
+  }, [summary]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,10 +113,11 @@ export default function Home() {
               </button>
             </div>
             <textarea
+              ref={summaryTextareaRef}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none overflow-hidden"
+              rows={1}
             />
           </div>
         )}
