@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 
 type SummaryResponse = {
   summary: string;
@@ -60,9 +61,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            SCC Snap Summary
+        <div className="text-center mb-12 flex flex-col items-center">
+          <Image
+            src="/SCC_logo.png"
+            alt="SCC Logo"
+            width={128}
+            height={128}
+            priority
+          />
+          <h1 className="text-4xl font-bold text-gray-900 mt-4">
+            Snap Summary
           </h1>
         </div>
 
