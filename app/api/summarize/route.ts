@@ -5,10 +5,9 @@ import {
 } from "@google/generative-ai";
 
 const MODEL_CANDIDATES = [
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
-  "gemini-1.5-pro",
-  "gemini-1.0-pro",
+  "gemini-3-flash",
+  "gemini-2.5-flash",
+  "gemini-2.5-flash-lite",
 ];
 
 const isApiKeyError = (error: unknown) =>
@@ -113,8 +112,7 @@ ${text}`;
     console.error("Gemini API Error:", lastError);
     return NextResponse.json(
       {
-        error:
-          "Model configuration error. None of the configured models are available.",
+        error: `Model configuration error. None of the configured models are available: ${MODEL_CANDIDATES.join(", ")}.`,
       },
       { status: 500 }
     );
