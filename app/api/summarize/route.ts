@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize the Google Generative AI with your API key
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
-
 export async function POST(request: Request) {
+  const modelName = process.env.GOOGLE_MODEL || "gemini-1.5-flash";
+
   try {
     if (!process.env.GOOGLE_API_KEY) {
       return NextResponse.json(
@@ -13,16 +12,17 @@ export async function POST(request: Request) {
       );
     }
 
+    const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
     const { text } = await request.json();
     
-    if (!text) {
+    if (!text || !text.trim()) {
       return NextResponse.json(
         { error: "No text provided" },
         { status: 400 }
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: modelName });
 
     const prompt = `Summarize the following text into 1-4 short sentences. Follow these specific rules:
 
@@ -64,9 +64,9 @@ ${text}`;
           { status: 401 }
         );
       }
-      if (error.message.includes('model')) {
+      if (error.message.toLowerCase().includes('model')) {
         return NextResponse.json(
-          { error: "Model configuration error. Please check the model name and availability." },
+          { error: `Model configuration error for "${modelName}". Please check the model name and availability.` },
           { status: 500 }
         );
       }
